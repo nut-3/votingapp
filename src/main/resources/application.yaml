@@ -1,0 +1,21 @@
+spring:
+  data:
+    rest:
+      base-path: /api
+  datasource:
+    driverClassName: org.h2.Driver
+    password: ''
+    url: jdbc:h2:mem:topjava_graduate
+    username: sa
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      javax:
+        persistence:
+          schema-generation:
+            scripts:
+              create-target: build/schema.sql
+              action: create
