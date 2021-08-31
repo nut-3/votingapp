@@ -6,15 +6,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import ru.topjava.votingapp.error.TooLateException;
 import ru.topjava.votingapp.model.LunchMenu;
 import ru.topjava.votingapp.model.Restaurant;
 
 import javax.validation.Valid;
 import java.net.URI;
-import java.time.LocalTime;
 
-import static ru.topjava.votingapp.config.AppConfig.TIME_LIMIT;
 import static ru.topjava.votingapp.util.validation.ValidationUtil.checkNew;
 
 @RestController
