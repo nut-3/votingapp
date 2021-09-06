@@ -1,13 +1,13 @@
 package ru.topjava.votingapp.web.restaurant;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import ru.topjava.votingapp.model.LunchMenu;
-import ru.topjava.votingapp.model.Restaurant;
+import ru.topjava.votingapp.to.RestaurantTo;
+import ru.topjava.votingapp.web.AuthUser;
 
 import java.util.List;
 
@@ -20,30 +20,19 @@ public class RestaurantController extends AbstractRestaurantController {
 
     @Override
     @GetMapping
-    public List<Restaurant> getAll() {
+    public List<RestaurantTo> getAll() {
         return super.getAll();
     }
 
+    @Override
     @GetMapping("/{id}")
-    public ResponseEntity<Restaurant> get(@PathVariable int id) {
+    public ResponseEntity<RestaurantTo> get(@PathVariable int id) {
         return super.get(id);
-    }
-
-    @Override
-    @GetMapping("/{id}/menus")
-    public List<LunchMenu> getMenus(@PathVariable int id) {
-        return super.getMenus(id);
-    }
-
-    @Override
-    @GetMapping("/{restaurantId}/menus/{id}")
-    public ResponseEntity<LunchMenu> getMenu(@PathVariable int restaurantId, @PathVariable int id) {
-        return super.getMenu(restaurantId, id);
     }
 
     @PostMapping("/{id}/vote")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void vote(@PathVariable int id) {
-        checkTime();
+    public void vote(@PathVariable int id, @AuthenticationPrincipal AuthUser authUser) {
+        super.vote(id, authUser.getUser());
     }
 }

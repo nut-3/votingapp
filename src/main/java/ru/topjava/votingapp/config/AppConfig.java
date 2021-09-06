@@ -21,7 +21,7 @@ import java.time.LocalTime;
 @EnableCaching
 public class AppConfig {
 
-    public static final LocalTime TIME_LIMIT = LocalTime.of(11, 0);
+    public static final LocalTime VOTE_TIME_LIMIT = LocalTime.of(11, 0);
 
     @Bean(initMethod = "start", destroyMethod = "stop")
     @Profile("!test")

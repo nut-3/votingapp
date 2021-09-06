@@ -1,59 +1,71 @@
 package ru.topjava.votingapp.web.restaurant;
 
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.topjava.votingapp.AbstractControllerTest;
 import ru.topjava.votingapp.model.Restaurant;
+import ru.topjava.votingapp.model.Vote;
+import ru.topjava.votingapp.repository.VoteRepository;
+import ru.topjava.votingapp.web.TestClock10;
 import ru.topjava.votingapp.web.user.UserTestData;
 
 import java.time.Clock;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.List;
+import java.time.LocalDate;
+import java.util.Collections;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static ru.topjava.votingapp.util.RestaurantUtility.createListTo;
+import static ru.topjava.votingapp.util.RestaurantUtility.createTo;
 import static ru.topjava.votingapp.web.restaurant.RestaurantTestData.*;
+import static ru.topjava.votingapp.web.restaurant.menu.MenuTestData.*;
+import static ru.topjava.votingapp.web.user.UserTestData.USER_ID;
+import static ru.topjava.votingapp.web.user.UserTestData.user;
 
 @WithUserDetails(value = UserTestData.USER_MAIL)
+@Import(TestClock10.class)
 class RestaurantControllerTest extends AbstractControllerTest {
 
     private static final String REST_URL = RestaurantController.REST_URL + "/";
 
+    @Autowired
+    private Clock clock;
+
+    @Autowired
+    private VoteRepository voteRepository;
+
+
     @Test
     void getAll() throws Exception {
         Restaurant pushkin1 = new Restaurant(pushkin);
-        pushkin1.setMenus(List.of(pushkinLunchMenu2));
         Restaurant mcdonalds1 = new Restaurant(mcdonalds);
-        mcdonalds1.setMenus(List.of(mcdonaldsLunchMenu2));
         Restaurant kebab1 = new Restaurant(kebab);
-        kebab1.setMenus(List.of(kebabLunchMenu2));
+        pushkin1.addMenus(pushkinLunchMenu2);
+        mcdonalds1.addMenus(mcdonaldsLunchMenu2);
+        kebab1.addMenus(kebabLunchMenu2);
 
         perform(MockMvcRequestBuilders.get(REST_URL))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(MATCHER.contentJson(pushkin1, mcdonalds1, kebab1));
+                .andExpect(TO_MATCHER.contentJson(createListTo(Collections.emptyMap(), pushkin1, mcdonalds1, kebab1)));
     }
 
     @Test
     void get() throws Exception {
         Restaurant mcdonalds1 = new Restaurant(mcdonalds);
-        mcdonalds1.setMenus(List.of(mcdonaldsLunchMenu1, mcdonaldsLunchMenu2));
+        mcdonalds1.addMenus(mcdonaldsLunchMenu2);
 
         perform(MockMvcRequestBuilders.get(REST_URL + MCDONALDS_ID))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(MATCHER.contentJson(mcdonalds));
+                .andExpect(TO_MATCHER.contentJson(createTo(0, mcdonalds1)));
     }
 
     @Test
@@ -64,33 +76,27 @@ class RestaurantControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    void getMenus() throws Exception {
-        perform(MockMvcRequestBuilders.get(REST_URL + PUSHKIN_ID + "/menus"))
-                .andExpect(status().isOk())
-                .andDo(print())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(MENU_MATCHER.contentJson(List.of(pushkinLunchMenu1, pushkinLunchMenu2)));
+    void vote() throws Exception {
+        perform(MockMvcRequestBuilders.post(REST_URL + MCDONALDS_ID + "/vote"))
+                .andExpect(status().isNoContent())
+                .andDo(print());
+
+        Vote newVote = new Vote(LocalDate.now(clock), user, mcdonalds);
+        Vote voteFromRepo = voteRepository.getByUserIdAndDate(USER_ID, LocalDate.now(clock)).orElse(null);
+        VOTE_MATCHER.assertMatch(newVote, voteFromRepo);
     }
 
     @Test
-    void getMenu() throws Exception {
-        perform(MockMvcRequestBuilders.get(REST_URL + PUSHKIN_ID + "/menus/" + pushkinLunchMenu2.id()))
-                .andExpect(status().isOk())
-                .andDo(print())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(MENU_MATCHER.contentJson(pushkinLunchMenu2));
-    }
+    void voteChange() throws Exception {
+        perform(MockMvcRequestBuilders.post(REST_URL + PUSHKIN_ID + "/vote"))
+                .andExpect(status().isNoContent())
+                .andDo(print());
+        perform(MockMvcRequestBuilders.post(REST_URL + KEBAB_ID + "/vote"))
+                .andExpect(status().isNoContent())
+                .andDo(print());
 
-    @Slf4j
-    @TestConfiguration
-    static class TestClock {
-
-        @Primary
-        @Bean
-        public Clock fixedClockForRestaurantController() {
-            Clock clock = Clock.fixed(Instant.parse("2021-08-30T10:00:00.00Z"), ZoneId.of("UTC"));
-            log.info("Setting time to {}", LocalDateTime.now(clock));
-            return clock;
-        }
+        Vote newVote = new Vote(LocalDate.now(clock), user, kebab);
+        Vote voteFromRepo = voteRepository.getByUserIdAndDate(USER_ID, LocalDate.now(clock)).orElse(null);
+        VOTE_MATCHER.assertMatch(newVote, voteFromRepo);
     }
 }

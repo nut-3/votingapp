@@ -10,7 +10,11 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -27,6 +31,7 @@ public class LunchMenu extends BaseEntity {
     @NotNull
     private LocalDate date = LocalDate.now();
 
+    @Size(min = 2, max = 5)
     @BatchSize(size = 200)
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "menu", cascade = CascadeType.ALL)
     @OrderBy("id ASC")
@@ -44,5 +49,15 @@ public class LunchMenu extends BaseEntity {
     public LunchMenu(Integer id, LocalDate date) {
         super(id);
         this.date = date;
+    }
+
+    public void addDishes(Dish... dishes) {
+        if (dishes != null) {
+            if (this.dishes == null) {
+                this.dishes = new HashSet<>();
+            }
+            Arrays.stream(dishes).forEach(dish -> dish.setMenu(this));
+            this.dishes.addAll(List.of(dishes));
+        }
     }
 }

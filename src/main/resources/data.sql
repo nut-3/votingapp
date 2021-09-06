@@ -39,3 +39,8 @@ VALUES (1, 'Bouillabaisse', 1500),
        (6, 'Chicken in pita bread', 120),
        (6, 'Meat in pita', 100),
        (6, 'Flatbread', 150);
+
+insert into VOTES ("DATE", RESTAURANT_ID, USER_ID)
+values (DATE '2021-08-30', 1, 2),
+       (DATE '2021-08-22', 3, 1),
+       (DATE '2021-08-22', 3, 2);

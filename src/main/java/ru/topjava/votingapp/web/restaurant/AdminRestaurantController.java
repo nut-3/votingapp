@@ -6,12 +6,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import ru.topjava.votingapp.model.LunchMenu;
 import ru.topjava.votingapp.model.Restaurant;
 
 import javax.validation.Valid;
 import java.net.URI;
 
+import static ru.topjava.votingapp.util.validation.ValidationUtil.assureIdConsistent;
 import static ru.topjava.votingapp.util.validation.ValidationUtil.checkNew;
 
 @RestController
@@ -39,14 +39,11 @@ public class AdminRestaurantController extends AbstractRestaurantController {
         return ResponseEntity.created(uriOfNewResource).body(created);
     }
 
-    @PostMapping(value = "/{restaurantId}/menus", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<LunchMenu> addMenuWithLocation(@Valid @RequestBody LunchMenu menu, @PathVariable int restaurantId) {
-        log.info("create {}", menu);
-        checkNew(menu);
-        LunchMenu savedMenu = super.addMenu(menu, restaurantId);
-        URI uriOfResource = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path(RestaurantController.REST_URL + "/{id}/menus/{menuId}")
-                .buildAndExpand(restaurantId, savedMenu.id()).toUri();
-        return ResponseEntity.created(uriOfResource).body(savedMenu);
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void update(@Valid @RequestBody Restaurant restaurant, @PathVariable int id) {
+        log.info("update {} with id={}", restaurant, id);
+        assureIdConsistent(restaurant, id);
+        super.save(restaurant);
     }
 }

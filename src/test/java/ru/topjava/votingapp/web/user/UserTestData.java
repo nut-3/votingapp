@@ -1,5 +1,6 @@
 package ru.topjava.votingapp.web.user;
 
+import lombok.experimental.UtilityClass;
 import ru.topjava.votingapp.MatcherFactory;
 import ru.topjava.votingapp.model.Role;
 import ru.topjava.votingapp.model.User;
@@ -8,6 +9,7 @@ import ru.topjava.votingapp.util.JsonUtil;
 import java.util.Collections;
 import java.util.Date;
 
+@UtilityClass
 public class UserTestData {
     public static final MatcherFactory.Matcher<User> MATCHER = MatcherFactory.usingIgnoringFieldsComparator(User.class, "registered", "password");
 

@@ -8,7 +8,7 @@ import javax.validation.constraints.Size;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class NamedTo extends BaseTo {
+public abstract class NamedTo extends BaseTo {
     @NotBlank
     @Size(min = 2, max = 100)
     protected String name;
