@@ -15,7 +15,7 @@ import ru.topjava.votingapp.web.user.UserTestData;
 
 import java.time.Clock;
 import java.time.LocalDate;
-import java.util.Collections;
+import java.util.Map;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -53,7 +53,7 @@ class RestaurantControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(TO_MATCHER.contentJson(createListTo(Collections.emptyMap(), pushkin1, mcdonalds1, kebab1)));
+                .andExpect(TO_MATCHER.contentJson(createListTo(Map.of(1, 1), pushkin1, mcdonalds1, kebab1)));
     }
 
     @Test
@@ -83,7 +83,7 @@ class RestaurantControllerTest extends AbstractControllerTest {
 
         Vote newVote = new Vote(LocalDate.now(clock), user, mcdonalds);
         Vote voteFromRepo = voteRepository.getByUserIdAndDate(USER_ID, LocalDate.now(clock)).orElse(null);
-        VOTE_MATCHER.assertMatch(newVote, voteFromRepo);
+        VOTE_MATCHER.assertMatch(voteFromRepo, newVote);
     }
 
     @Test
@@ -97,6 +97,6 @@ class RestaurantControllerTest extends AbstractControllerTest {
 
         Vote newVote = new Vote(LocalDate.now(clock), user, kebab);
         Vote voteFromRepo = voteRepository.getByUserIdAndDate(USER_ID, LocalDate.now(clock)).orElse(null);
-        VOTE_MATCHER.assertMatch(newVote, voteFromRepo);
+        VOTE_MATCHER.assertMatch(voteFromRepo, newVote);
     }
 }

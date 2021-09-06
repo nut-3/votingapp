@@ -10,6 +10,7 @@ import ru.topjava.votingapp.model.User;
 import ru.topjava.votingapp.model.Vote;
 import ru.topjava.votingapp.repository.RestaurantRepository;
 import ru.topjava.votingapp.repository.VoteRepository;
+import ru.topjava.votingapp.repository.projection.RestaurantRatingView;
 import ru.topjava.votingapp.to.RestaurantTo;
 
 import java.time.Clock;
@@ -17,7 +18,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 import static ru.topjava.votingapp.config.AppConfig.VOTE_TIME_LIMIT;
 import static ru.topjava.votingapp.util.RestaurantUtility.createListTo;
@@ -38,18 +39,21 @@ public abstract class AbstractRestaurantController {
     @Transactional(readOnly = true)
     public List<RestaurantTo> getAll() {
         log.info("getAll restaurants");
-        LocalDate date = LocalDate.now(clock);
-        Map<Integer, Integer> ratings = voteRepository.countByDateGroupByRestaurantId(date);
-        List<Restaurant> restaurants = restaurantRepository.getAllByMenusDate(date);
-        return createListTo(ratings, restaurants);
+        LocalDate today = LocalDate.now(clock);
+        List<Restaurant> restaurants = restaurantRepository.getAllByMenusDate(today);
+        List<RestaurantRatingView> ratings = voteRepository.countByDateGroupByRestaurantId(today);
+        return createListTo(ratings.stream()
+                        .collect(Collectors.toMap(RestaurantRatingView::getRestaurantId,
+                                RestaurantRatingView::getRating)),
+                restaurants);
     }
 
     @Transactional(readOnly = true)
     public ResponseEntity<RestaurantTo> get(int id) {
         log.info("get restaurant {}", id);
-        LocalDate date = LocalDate.now(clock);
-        int rating = voteRepository.countByRestaurantIdAndDate(id, date);
-        Restaurant restaurant = restaurantRepository.getByIdAndMenusDate(id, date);
+        LocalDate today = LocalDate.now(clock);
+        Restaurant restaurant = restaurantRepository.getByIdAndMenusDate(id, today);
+        int rating = voteRepository.countByRestaurantIdAndDate(id, today);
         return ResponseEntity.of(createOptionalTo(rating, restaurant));
     }
 
@@ -66,14 +70,15 @@ public abstract class AbstractRestaurantController {
 
     @Transactional
     public void vote(int id, User user) {
+        LocalDate today = LocalDate.now(clock);
         if (LocalTime.now(clock).isAfter(VOTE_TIME_LIMIT)) {
             throw new TooLateException("Voting is only available before " + VOTE_TIME_LIMIT.format(DateTimeFormatter.ISO_LOCAL_TIME));
         }
         log.info("user {} voted for restaurant {}", user.id(), id);
         Restaurant restaurant = restaurantRepository.getById(id);
-        Vote vote = voteRepository.getByUserIdAndDate(user.id(), LocalDate.now(clock))
-                .orElse(new Vote(user, LocalDate.now(clock)));
+        Vote vote = voteRepository.getByUserIdAndDate(user.id(), today)
+                .orElse(new Vote(user, today));
         vote.setRestaurant(restaurant);
-        Vote vote1 = voteRepository.save(vote);
+        voteRepository.save(vote);
     }
 }

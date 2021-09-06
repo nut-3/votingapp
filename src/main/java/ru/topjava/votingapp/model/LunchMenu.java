@@ -1,7 +1,6 @@
 package ru.topjava.votingapp.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
@@ -12,10 +11,8 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -33,11 +30,13 @@ public class LunchMenu extends BaseEntity {
 
     @Size(min = 2, max = 5)
     @BatchSize(size = 200)
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "menu", cascade = CascadeType.ALL)
-    @OrderBy("id ASC")
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "dishes", joinColumns = @JoinColumn(name = "menu_id"),
+            uniqueConstraints = {@UniqueConstraint(columnNames = {"menu_id", "name"}, name = "dishes_unique_menu_id_name_idx")})
+    @JoinColumn(name = "menu_id") //https://stackoverflow.com/a/62848296/548473
+    @Column(name = "name")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonManagedReference
-    private Set<Dish> dishes;
+    private List<Dish> dishes;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id", nullable = false)
@@ -54,9 +53,8 @@ public class LunchMenu extends BaseEntity {
     public void addDishes(Dish... dishes) {
         if (dishes != null) {
             if (this.dishes == null) {
-                this.dishes = new HashSet<>();
+                this.dishes = new ArrayList<>();
             }
-            Arrays.stream(dishes).forEach(dish -> dish.setMenu(this));
             this.dishes.addAll(List.of(dishes));
         }
     }

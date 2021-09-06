@@ -14,6 +14,7 @@ import ru.topjava.votingapp.repository.VoteRepository;
 import ru.topjava.votingapp.to.VoteTo;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.List;
 
 import static ru.topjava.votingapp.util.VoteUtil.createListTos;
@@ -35,6 +36,21 @@ public class VoteController {
                                  @Nullable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @RequestParam LocalDate from,
                                  @Nullable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @RequestParam LocalDate to) {
         log.info("Vote history from {} to {} ", from, to);
-        return createListTos(voteRepository.getVotes(restaurantId, userId, from, to));
+
+        if (from == null) {
+            // https://docs.oracle.com/javadb/10.6.2.1/ref/rrefdttlimits.html
+            from = LocalDate.of(1, Month.JANUARY, 1);
+        }
+        if (to == null) {
+            to = LocalDate.of(9999, Month.DECEMBER, 31);
+        }
+        if (userId == null && restaurantId == null) {
+            return createListTos(voteRepository.getBetweenDates(from, to));
+        } else if (userId == null) {
+            return createListTos(voteRepository.getByRestaurantIdBetweenDates(restaurantId, from, to));
+        } else if (restaurantId == null) {
+            return createListTos(voteRepository.getByUserIdBetweenDates(userId, from, to));
+        }
+        return  createListTos(voteRepository.getByRestaurantIdAndUserIdBetweenDates(restaurantId, userId, from, to));
     }
 }

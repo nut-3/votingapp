@@ -11,10 +11,6 @@ import java.util.stream.Collectors;
 public class VoteUtil {
 
     public static VoteTo createTo(Vote vote) {
-//        LunchMenu menu = vote.getRestaurant().getMenus().stream()
-//                .filter(menu1 -> menu1.getDate().equals(vote.getDate()))
-//                .findFirst().orElse(null);
-//        vote.getRestaurant().setMenus(menu == null ? null : List.of(menu));
         return new VoteTo(vote.getDate(), vote.getUser(), RestaurantUtility.createTo(-1, vote.getRestaurant()));
     }
 

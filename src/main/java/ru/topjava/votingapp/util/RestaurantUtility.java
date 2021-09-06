@@ -1,7 +1,6 @@
 package ru.topjava.votingapp.util;
 
 import lombok.experimental.UtilityClass;
-import ru.topjava.votingapp.model.Dish;
 import ru.topjava.votingapp.model.Restaurant;
 import ru.topjava.votingapp.to.RestaurantTo;
 
@@ -22,15 +21,11 @@ public class RestaurantUtility {
         if (restaurant == null) {
             return null;
         }
-        List<Dish> dishes = null;
-        if (restaurant.getMenus() != null) {
-            dishes = restaurant.getMenus().get(0).getDishes().stream().toList();
-        }
-        return new RestaurantTo(restaurant.id(), restaurant.getName(), rating, dishes);
+        return new RestaurantTo(restaurant.id(), restaurant.getName(), rating, restaurant.getMenus().get(0).getDishes());
     }
 
     public static List<RestaurantTo> createListTo(Map<Integer, Integer> ratings, List<Restaurant> restaurants) {
-        if (restaurants == null) {
+        if (restaurants == null || restaurants.isEmpty()) {
             return Collections.emptyList();
         }
         return restaurants.stream()

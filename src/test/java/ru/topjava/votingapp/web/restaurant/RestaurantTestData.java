@@ -10,7 +10,7 @@ import ru.topjava.votingapp.to.RestaurantTo;
 public class RestaurantTestData {
     public static final MatcherFactory.Matcher<Restaurant> MATCHER = MatcherFactory.usingIgnoringFieldsComparator(Restaurant.class, "menu");
     public static final MatcherFactory.Matcher<RestaurantTo> TO_MATCHER = MatcherFactory.usingIgnoringFieldsComparator(RestaurantTo.class, "menu.id", "menu.menu");
-    public static final MatcherFactory.Matcher<Vote> VOTE_MATCHER = MatcherFactory.usingIgnoringFieldsComparator(Vote.class, "id", "restaurant.menus", "user.registered", "user.password");
+    public static final MatcherFactory.Matcher<Vote> VOTE_MATCHER = MatcherFactory.usingIgnoringFieldsComparator(Vote.class, "id", "restaurant.menus", "restaurant.$$_hibernate_interceptor", "user.registered", "user.password");
 
     public static final int PUSHKIN_ID = 1;
     public static final int MCDONALDS_ID = 2;

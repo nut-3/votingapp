@@ -1,0 +1,543 @@
+openapi: 3.0.1
+info:
+  title: REST API documentation
+  description: >-
+    Приложение по <a href='https://javaops.ru/view/topjava2'>курсу TopJava-2</a>
+    (решение выпускного проекта)<br>Для /api/admin использовать логин / пароль:
+    admin@gmail.com / admin<br>Для /api/profile использовать логин / пароль:
+    user@yandex.ru / password
+  contact:
+    name: Konstantin Shurukhin
+    email: kshurukhin@gmail.com
+  version: '1.0'
+servers:
+  - url: http://localhost:8080
+    description: Generated server url
+security:
+  - basicAuth: []
+paths:
+  /api/profile:
+    get:
+      tags:
+        - profile-controller
+      operationId: get_2
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+    put:
+      tags:
+        - profile-controller
+      operationId: update
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserTo'
+        required: true
+      responses:
+        '204':
+          description: No Content
+    post:
+      tags:
+        - profile-controller
+      operationId: register
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserTo'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+    delete:
+      tags:
+        - profile-controller
+      operationId: delete
+      responses:
+        '204':
+          description: No Content
+  /api/admin/users/{id}:
+    get:
+      tags:
+        - admin-user-controller
+      operationId: get_3
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+    put:
+      tags:
+        - admin-user-controller
+      operationId: update_1
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        '204':
+          description: No Content
+    delete:
+      tags:
+        - admin-user-controller
+      operationId: delete_1
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '204':
+          description: No Content
+    patch:
+      tags:
+        - admin-user-controller
+      operationId: enable
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: enabled
+          in: query
+          required: true
+          schema:
+            type: boolean
+      responses:
+        '204':
+          description: No Content
+  /api/admin/restaurants/{id}:
+    put:
+      tags:
+        - admin-restaurant-controller
+      operationId: update_2
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Restaurant'
+        required: true
+      responses:
+        '204':
+          description: No Content
+    delete:
+      tags:
+        - admin-restaurant-controller
+      operationId: delete_2
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '204':
+          description: No Content
+  /api/restaurants/{id}/vote:
+    post:
+      tags:
+        - restaurant-controller
+      operationId: vote
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '204':
+          description: No Content
+  /api/admin/users:
+    get:
+      tags:
+        - admin-user-controller
+      operationId: getAll_2
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    post:
+      tags:
+        - admin-user-controller
+      operationId: createWithLocation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+  /api/admin/restaurants:
+    post:
+      tags:
+        - admin-restaurant-controller
+      operationId: createWithLocation_1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Restaurant'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Restaurant'
+  /api/admin/restaurants/{restaurantId}/menus:
+    post:
+      tags:
+        - admin-restaurant-menu-controller
+      operationId: addMenuWithLocation
+      parameters:
+        - name: restaurantId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LunchMenu'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LunchMenu'
+  /api/votes:
+    get:
+      tags:
+        - vote-controller
+      operationId: getVotes
+      parameters:
+        - name: restaurantId
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: userId
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: from
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VoteTo'
+  /api/restaurants:
+    get:
+      tags:
+        - restaurant-controller
+      operationId: getAll
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RestaurantTo'
+  /api/restaurants/{restaurantId}/menus:
+    get:
+      tags:
+        - restaurant-menu-controller
+      operationId: getAll_1
+      parameters:
+        - name: restaurantId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LunchMenu'
+  /api/restaurants/{restaurantId}/menus/{id}:
+    get:
+      tags:
+        - restaurant-menu-controller
+      operationId: get
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: restaurantId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LunchMenu'
+  /api/restaurants/{id}:
+    get:
+      tags:
+        - restaurant-controller
+      operationId: get_1
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestaurantTo'
+  /api/admin/users/by:
+    get:
+      tags:
+        - admin-user-controller
+      operationId: getByEmail
+      parameters:
+        - name: email
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+components:
+  schemas:
+    UserTo:
+      required:
+        - email
+        - name
+        - password
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        name:
+          maxLength: 100
+          minLength: 2
+          type: string
+        email:
+          maxLength: 100
+          minLength: 0
+          type: string
+        password:
+          maxLength: 32
+          minLength: 5
+          type: string
+    User:
+      required:
+        - email
+        - name
+        - password
+        - registered
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        name:
+          maxLength: 100
+          minLength: 2
+          type: string
+        email:
+          maxLength: 100
+          minLength: 0
+          type: string
+        password:
+          maxLength: 100
+          minLength: 5
+          type: string
+          writeOnly: true
+        enabled:
+          type: boolean
+        registered:
+          type: string
+          format: date-time
+          readOnly: true
+        roles:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+            enum:
+              - USER
+              - ADMIN
+    Dish:
+      required:
+        - name
+      type: object
+      properties:
+        name:
+          maxLength: 100
+          minLength: 2
+          type: string
+        price:
+          type: number
+          format: double
+    LunchMenu:
+      required:
+        - date
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        date:
+          type: string
+          format: date
+        dishes:
+          maxItems: 5
+          minItems: 2
+          type: array
+          items:
+            $ref: '#/components/schemas/Dish'
+    Restaurant:
+      required:
+        - name
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        name:
+          maxLength: 100
+          minLength: 2
+          type: string
+        menus:
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/LunchMenu'
+    RestaurantTo:
+      required:
+        - name
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        name:
+          maxLength: 100
+          minLength: 2
+          type: string
+        rating:
+          type: integer
+          format: int32
+        menu:
+          type: array
+          items:
+            $ref: '#/components/schemas/Dish'
+    VoteTo:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        date:
+          type: string
+          format: date
+        user:
+          $ref: '#/components/schemas/User'
+        restaurant:
+          $ref: '#/components/schemas/RestaurantTo'
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic

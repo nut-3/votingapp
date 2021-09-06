@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Configuration;
                 description = "Приложение по <a href='https://javaops.ru/view/topjava2'>курсу TopJava-2</a> (решение выпускного проекта)<br>" +
                         "Для /api/admin использовать логин / пароль: admin@gmail.com / admin<br>" +
                         "Для /api/profile использовать логин / пароль: user@yandex.ru / password",
-                contact = @Contact(name = "Konstantin Shurukhin", email = "kshurukhin_at_gmail.com")
+                contact = @Contact(name = "Konstantin Shurukhin", email = "kshurukhin@gmail.com")
         ),
         security = @SecurityRequirement(name = "basicAuth")
 )

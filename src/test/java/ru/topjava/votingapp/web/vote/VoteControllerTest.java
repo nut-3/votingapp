@@ -12,6 +12,7 @@ import ru.topjava.votingapp.to.VoteTo;
 import ru.topjava.votingapp.web.user.UserTestData;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -25,6 +26,8 @@ import static ru.topjava.votingapp.web.vote.VoteTestData.*;
 class VoteControllerTest extends AbstractControllerTest {
 
     private static final String REST_URL = VoteController.REST_URL + '/';
+    private static final LocalDate minDate = LocalDate.of(1, Month.JANUARY, 1);
+    private static final LocalDate maxDate = LocalDate.of(9999, Month.DECEMBER, 31);
 
     @Autowired
     private VoteRepository voteRepository;
@@ -33,13 +36,14 @@ class VoteControllerTest extends AbstractControllerTest {
     void getVotes() throws Exception {
         List<VoteTo> votes = createListTos(List.of(getOldUserVote(), getOldAdminVote(), getAdminVote()));
 
+
         ResultActions action = perform(MockMvcRequestBuilders.get(REST_URL))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
 
         List<VoteTo> votesFromRequest = MATCHER.readArrayFromJson(action);
-        List<VoteTo> votesFromRepo = createListTos(voteRepository.getVotes(null, null, null, null));
+        List<VoteTo> votesFromRepo = createListTos(voteRepository.getBetweenDates(minDate, maxDate));
 
         MATCHER.assertMatch(votes, votesFromRepo);
         MATCHER.assertMatch(votes, votesFromRequest);
@@ -54,7 +58,7 @@ class VoteControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
 
         List<VoteTo> votesFromRequest = MATCHER.readArrayFromJson(action);
-        List<VoteTo> votesFromRepo = createListTos(voteRepository.getVotes(pushkin.id(), null, LocalDate.of(2021, 8 ,23), LocalDate.of(2021, 8, 30)));
+        List<VoteTo> votesFromRepo = createListTos(voteRepository.getByRestaurantIdBetweenDates(pushkin.id(), LocalDate.of(2021, 8 ,23), LocalDate.of(2021, 8, 30)));
         MATCHER.assertMatch(votes, votesFromRepo);
         MATCHER.assertMatch(votes, votesFromRequest);
     }
