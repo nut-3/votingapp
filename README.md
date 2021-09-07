@@ -1,4 +1,5 @@
-Topjava Graduation Project - VotingApp
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/a1a489c11f75419691829c2ff4cda1af)](https://www.codacy.com/gh/nut-3/votingapp/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=nut-3/votingapp&amp;utm_campaign=Badge_Grade)[![Build Status](https://app.travis-ci.com/nut-3/votingapp.svg?branch=master)](https://app.travis-ci.com/nut-3/votingapp)
+Topjava Graduation Project - VotingApp 
 ===============================
  - Spring Boot
  - Jackson
