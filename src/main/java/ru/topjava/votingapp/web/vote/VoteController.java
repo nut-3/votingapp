@@ -37,20 +37,15 @@ public class VoteController {
                                  @Nullable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @RequestParam LocalDate to) {
         log.info("Vote history from {} to {} ", from, to);
 
-        if (from == null) {
-            // https://docs.oracle.com/javadb/10.6.2.1/ref/rrefdttlimits.html
-            from = LocalDate.of(1, Month.JANUARY, 1);
-        }
-        if (to == null) {
-            to = LocalDate.of(9999, Month.DECEMBER, 31);
-        }
+        LocalDate fromDate = from == null ? LocalDate.of(1, Month.JANUARY, 1) : from;
+        LocalDate toDate = to == null ? LocalDate.of(9999, Month.DECEMBER, 31) : to;
         if (userId == null && restaurantId == null) {
-            return createListTos(voteRepository.getBetweenDates(from, to));
+            return createListTos(voteRepository.getBetweenDates(fromDate, toDate));
         } else if (userId == null) {
-            return createListTos(voteRepository.getByRestaurantIdBetweenDates(restaurantId, from, to));
+            return createListTos(voteRepository.getByRestaurantIdBetweenDates(restaurantId, fromDate, toDate));
         } else if (restaurantId == null) {
-            return createListTos(voteRepository.getByUserIdBetweenDates(userId, from, to));
+            return createListTos(voteRepository.getByUserIdBetweenDates(userId, fromDate, toDate));
         }
-        return  createListTos(voteRepository.getByRestaurantIdAndUserIdBetweenDates(restaurantId, userId, from, to));
+        return  createListTos(voteRepository.getByRestaurantIdAndUserIdBetweenDates(restaurantId, userId, fromDate, toDate));
     }
 }
