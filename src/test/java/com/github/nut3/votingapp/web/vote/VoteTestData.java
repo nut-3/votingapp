@@ -10,15 +10,14 @@ import lombok.experimental.UtilityClass;
 import java.time.LocalDate;
 import java.util.List;
 
-import static com.github.nut3.votingapp.web.restaurant.RestaurantTestData.kebab;
-import static com.github.nut3.votingapp.web.restaurant.RestaurantTestData.pushkin;
-import static com.github.nut3.votingapp.web.restaurant.menu.MenuTestData.kebabLunchMenu1;
-import static com.github.nut3.votingapp.web.restaurant.menu.MenuTestData.pushkinLunchMenu2;
+import static com.github.nut3.votingapp.util.VoteUtil.createTo;
+import static com.github.nut3.votingapp.web.restaurant.RestaurantTestData.*;
+import static com.github.nut3.votingapp.web.restaurant.menu.MenuTestData.*;
 
 @UtilityClass
 public class VoteTestData {
     public static final MatcherFactory.Matcher<VoteTo> MATCHER =
-            MatcherFactory.usingIgnoringFieldsComparator(VoteTo.class, "id", "user.roles", "user.registered", "user.password", "restaurant.rating", "restaurant.menu.menu");
+            MatcherFactory.usingIgnoringFieldsComparator(VoteTo.class, "id", "user.roles", "user.registered", "user.password", "restaurant.menu");
 
     private static final LocalDate OLD_DATE = LocalDate.of(2021, 8, 22);
     private static final LocalDate NEW_DATE = LocalDate.of(2021, 8, 30);
@@ -39,5 +38,17 @@ public class VoteTestData {
         Restaurant restaurant = new Restaurant(kebab);
         restaurant.setMenus(List.of(kebabLunchMenu1));
         return new Vote(OLD_DATE, UserTestData.user, restaurant);
+    }
+
+    public static VoteTo getNewVoteTo(LocalDate date) {
+        Restaurant restaurant = new Restaurant(mcdonalds);
+        restaurant.setMenus(List.of(mcdonaldsLunchMenu2));
+        return createTo(new Vote(date, UserTestData.user, restaurant));
+    }
+
+    public static VoteTo getUpdatedVoteTo(int id, LocalDate date) {
+        Restaurant restaurant = new Restaurant(kebab);
+        restaurant.setMenus(List.of(kebabLunchMenu2));
+        return createTo(new Vote(id, date, UserTestData.user, restaurant));
     }
 }

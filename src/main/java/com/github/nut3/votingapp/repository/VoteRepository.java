@@ -1,24 +1,17 @@
 package com.github.nut3.votingapp.repository;
 
 import com.github.nut3.votingapp.model.Vote;
-import com.github.nut3.votingapp.repository.projection.RestaurantRatingView;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Transactional(readOnly = true)
 public interface VoteRepository extends BaseRepository<Vote> {
 
-    Optional<Vote> getByUserIdAndDate(int userId, LocalDate date);
-
-    int countByRestaurantIdAndDate(int restaurantId, LocalDate date);
-
-    @Query("select v.restaurant.id as restaurantId, count(v) as rating from Vote v where v.date = :date group by v.restaurant.id")
-    List<RestaurantRatingView> countByDateGroupByRestaurantId(LocalDate date);
+    Vote getByUserIdAndDate(int userId, LocalDate date);
 
     @EntityGraph(value = "graph.VoteDetails", type = EntityGraph.EntityGraphType.LOAD)
     @Query("""

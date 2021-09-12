@@ -67,7 +67,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     private Map<String, Object> getDefaultBody(WebRequest request, ErrorAttributeOptions options, String... msg) {
         Map<String, Object> body = errorAttributes.getErrorAttributes(request, options);
-        if (msg != null) {
+        if (msg != null && msg.length > 0) {
             body.put("message", msg);
         }
         return body;
