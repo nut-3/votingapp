@@ -22,10 +22,9 @@ public abstract class AbstractRestaurantController {
     @Autowired
     protected Clock clock;
 
-    public List<RestaurantTo> getAll() {
+    public List<Restaurant> getAll() {
         log.info("get all restaurants");
-        List<Restaurant> restaurants = restaurantRepository.findAll();
-        return RestaurantUtility.createListTo(restaurants);
+        return restaurantRepository.findAll();
     }
 
     public List<RestaurantTo> getAllWithMenu() {
@@ -35,10 +34,9 @@ public abstract class AbstractRestaurantController {
         return RestaurantUtility.createListTo(restaurants);
     }
 
-    public ResponseEntity<RestaurantTo> get(int id) {
+    public ResponseEntity<Restaurant> get(int id) {
         log.info("get restaurant {}", id);
-        Restaurant restaurant = restaurantRepository.getById(id);
-        return ResponseEntity.of(RestaurantUtility.createOptionalTo(restaurant));
+        return ResponseEntity.of(restaurantRepository.findById(id));
     }
 
     public ResponseEntity<RestaurantTo> getWithMenu(int id) {

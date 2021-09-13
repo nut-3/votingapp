@@ -13,10 +13,13 @@ public class MenuTestData {
 
     public static final LunchMenu pushkinLunchMenu1 = new LunchMenu(1, LocalDate.of(2021, 8, 22));
     public static final LunchMenu pushkinLunchMenu2 = new LunchMenu(2, LocalDate.of(2021, 8, 30));
+    public static final LunchMenu pushkinLunchMenu3 = new LunchMenu(7, LocalDate.now());
     public static final LunchMenu mcdonaldsLunchMenu1 = new LunchMenu(3, LocalDate.of(2021, 8, 22));
     public static final LunchMenu mcdonaldsLunchMenu2 = new LunchMenu(4, LocalDate.of(2021, 8, 30));
+    public static final LunchMenu mcdonaldsLunchMenu3 = new LunchMenu(8, LocalDate.now());
     public static final LunchMenu kebabLunchMenu1 = new LunchMenu(5, LocalDate.of(2021, 8, 22));
     public static final LunchMenu kebabLunchMenu2 = new LunchMenu(6, LocalDate.of(2021, 8, 30));
+    public static final LunchMenu kebabLunchMenu3 = new LunchMenu(9, LocalDate.now());
 
     public static final Dish pushkinDish1 = new Dish("Bouillabaisse", 1500);
     public static final Dish pushkinDish2 = new Dish("Poached Egg", 2300);
@@ -24,6 +27,9 @@ public class MenuTestData {
     public static final Dish pushkinDish4 = new Dish("Nicoise", 1300);
     public static final Dish pushkinDish5 = new Dish("Fish with a Creamy Sauce", 2270);
     public static final Dish pushkinDish6 = new Dish("Tart Taten", 2050);
+    public static final Dish pushkinDish7 = new Dish("Duck breast", 5000);
+    public static final Dish pushkinDish8 = new Dish("Ricotta gnocchi", 1700);
+    public static final Dish pushkinDish9 = new Dish("Rostbif", 6200);
 
     public static final Dish mcdonaldsDish1 = new Dish("Big Mac", 250);
     public static final Dish mcdonaldsDish2 = new Dish("Cherry Pie", 170);
@@ -31,6 +37,9 @@ public class MenuTestData {
     public static final Dish mcdonaldsDish4 = new Dish("BigTasty", 320);
     public static final Dish mcdonaldsDish5 = new Dish("Nuggets", 120);
     public static final Dish mcdonaldsDish6 = new Dish("French Fries", 60);
+    public static final Dish mcdonaldsDish7 = new Dish("French fries", 99);
+    public static final Dish mcdonaldsDish8 = new Dish("Cheeseburger", 120);
+    public static final Dish mcdonaldsDish9 = new Dish("Shrimp roll", 150);
 
     public static final Dish kebabDish1 = new Dish("Shawarma", 100);
     public static final Dish kebabDish2 = new Dish("Shawerma", 70);
@@ -38,6 +47,9 @@ public class MenuTestData {
     public static final Dish kebabDish4 = new Dish("Chicken in pita bread", 120);
     public static final Dish kebabDish5 = new Dish("Meat in pita", 100);
     public static final Dish kebabDish6 = new Dish("Flatbread", 150);
+    public static final Dish kebabDish7 = new Dish("Kharcho", 120);
+    public static final Dish kebabDish8 = new Dish("Khachapuri", 100);
+    public static final Dish kebabDish9 = new Dish("Veg salad", 150);
 
     static {
         pushkinLunchMenu1.addDishes(pushkinDish1, pushkinDish2, pushkinDish3);
@@ -46,6 +58,9 @@ public class MenuTestData {
         mcdonaldsLunchMenu2.addDishes(mcdonaldsDish4, mcdonaldsDish5, mcdonaldsDish6);
         kebabLunchMenu1.addDishes(kebabDish1, kebabDish2, kebabDish3);
         kebabLunchMenu2.addDishes(kebabDish4, kebabDish5, kebabDish6);
+        pushkinLunchMenu3.addDishes(pushkinDish7, pushkinDish8, pushkinDish9);
+        mcdonaldsLunchMenu3.addDishes(mcdonaldsDish7, mcdonaldsDish8, mcdonaldsDish9);
+        kebabLunchMenu3.addDishes(kebabDish7, kebabDish8, kebabDish9);
     }
 
     public static LunchMenu getNewMenu() {

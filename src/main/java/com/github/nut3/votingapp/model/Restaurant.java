@@ -1,7 +1,6 @@
 package com.github.nut3.votingapp.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -26,9 +25,8 @@ public class Restaurant extends NamedEntity {
     @BatchSize(size = 200)
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "restaurant")
     @OnDelete(action = OnDeleteAction.CASCADE) //https://stackoverflow.com/a/44988100/548473
-    @JsonManagedReference
+    @JsonIgnore
     @ToString.Exclude
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @OrderBy("date DESC")
     private List<LunchMenu> menus;
 

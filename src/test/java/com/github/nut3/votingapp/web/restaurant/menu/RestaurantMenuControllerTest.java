@@ -31,7 +31,7 @@ class RestaurantMenuControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(MATCHER.contentJson(List.of(pushkinLunchMenu1, pushkinLunchMenu2)));
+                .andExpect(MATCHER.contentJson(List.of(pushkinLunchMenu1, pushkinLunchMenu2, pushkinLunchMenu3)));
     }
 
     @Test

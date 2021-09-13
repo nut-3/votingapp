@@ -23,7 +23,7 @@ import static com.github.nut3.votingapp.util.JsonUtil.writeValue;
 import static com.github.nut3.votingapp.util.VoteUtil.createListTos;
 import static com.github.nut3.votingapp.util.VoteUtil.createTo;
 import static com.github.nut3.votingapp.web.restaurant.RestaurantTestData.pushkin;
-import static com.github.nut3.votingapp.web.user.UserTestData.admin;
+import static com.github.nut3.votingapp.web.user.UserTestData.ADMIN_ID;
 import static com.github.nut3.votingapp.web.vote.VoteTestData.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -31,7 +31,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WithUserDetails(value = UserTestData.USER_MAIL)
 @Import(TestClock10.class)
 class VoteControllerTest extends AbstractControllerTest {
-
 
     @Autowired
     private Clock clock;
@@ -44,32 +43,31 @@ class VoteControllerTest extends AbstractControllerTest {
     private VoteRepository voteRepository;
 
     @Test
+    @WithUserDetails(value = UserTestData.ADMIN_MAIL)
     void getVotes() throws Exception {
-        List<VoteTo> votes = createListTos(List.of(getOldUserVote(), getOldAdminVote(), getAdminVote()));
-
-
+        List<VoteTo> votes = createListTos(List.of(getOldAdminVote(), getAdminVote()));
         ResultActions action = perform(MockMvcRequestBuilders.get(REST_URL))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
 
-        List<VoteTo> votesFromRequest = MATCHER.readArrayFromJson(action);
-        List<VoteTo> votesFromRepo = createListTos(voteRepository.getBetweenDates(minDate, maxDate));
-
+        List<VoteTo> votesFromRequest = MATCHER.readListFromJson(action);
+        List<VoteTo> votesFromRepo = createListTos(voteRepository.getByUserIdBetweenDates(ADMIN_ID, minDate, maxDate));
         MATCHER.assertMatch(votes, votesFromRepo);
         MATCHER.assertMatch(votes, votesFromRequest);
     }
 
     @Test
-    void getVotesForAdmin() throws Exception {
+    @WithUserDetails(value = UserTestData.ADMIN_MAIL)
+    void getVotesForRestaurant() throws Exception {
         List<VoteTo> votes = createListTos(List.of(getAdminVote()));
         ResultActions action = perform(MockMvcRequestBuilders.get(REST_URL + "?restaurantId=" + pushkin.id() + "&from=2021-08-23&to=2021-08-30"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
 
-        List<VoteTo> votesFromRequest = MATCHER.readArrayFromJson(action);
-        List<VoteTo> votesFromRepo = createListTos(voteRepository.getByRestaurantIdAndUserIdBetweenDates(pushkin.id(), admin.id(), LocalDate.of(2021, 8, 23), LocalDate.of(2021, 8, 30)));
+        List<VoteTo> votesFromRequest = MATCHER.readListFromJson(action);
+        List<VoteTo> votesFromRepo = createListTos(voteRepository.getByRestaurantIdAndUserIdBetweenDates(pushkin.id(), ADMIN_ID, LocalDate.of(2021, 8, 23), LocalDate.of(2021, 8, 30)));
         MATCHER.assertMatch(votes, votesFromRepo);
         MATCHER.assertMatch(votes, votesFromRequest);
     }
@@ -89,7 +87,6 @@ class VoteControllerTest extends AbstractControllerTest {
         newVote.setId(newId);
         action.andExpect(redirectedUrlPattern("http*//*" + REST_URL + newId));
         Vote voteFromRepo = voteRepository.getByUserIdAndDate(UserTestData.USER_ID, LocalDate.now(clock));
-
         MATCHER.assertMatch(createTo(voteFromRepo), newVote);
         MATCHER.assertMatch(created, newVote);
     }
@@ -106,7 +103,6 @@ class VoteControllerTest extends AbstractControllerTest {
         int newId = created.id();
 
         VoteTo updatedVote = getUpdatedVoteTo(newId, LocalDate.now(clock));
-
         perform(MockMvcRequestBuilders.put(REST_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(writeValue(updatedVote)))

@@ -33,13 +33,4 @@ public interface VoteRepository extends BaseRepository<Vote> {
                 order by v.date
             """)
     List<Vote> getByUserIdBetweenDates(int userId, LocalDate start, LocalDate end);
-
-    @EntityGraph(value = "graph.VoteDetails", type = EntityGraph.EntityGraphType.LOAD)
-    @Query("""
-            select v from Vote v left join v.restaurant r left join r.menus m
-                where v.date between :start and :end
-                and m.date = v.date
-                order by v.date
-            """)
-    List<Vote> getBetweenDates(LocalDate start, LocalDate end);
 }

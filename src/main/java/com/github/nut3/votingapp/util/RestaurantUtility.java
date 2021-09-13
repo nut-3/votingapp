@@ -1,5 +1,6 @@
 package com.github.nut3.votingapp.util;
 
+import com.github.nut3.votingapp.model.Dish;
 import com.github.nut3.votingapp.model.Restaurant;
 import com.github.nut3.votingapp.to.RestaurantTo;
 import lombok.experimental.UtilityClass;
@@ -20,7 +21,11 @@ public class RestaurantUtility {
         if (restaurant == null) {
             return null;
         }
-        return new RestaurantTo(restaurant.id(), restaurant.getName(), restaurant.getMenus().get(0).getDishes());
+        List<Dish> dishes = null;
+        if (restaurant.getMenus() != null) {
+            dishes = restaurant.getMenus().get(0).getDishes();
+        }
+        return new RestaurantTo(restaurant.id(), restaurant.getName(), dishes);
     }
 
     public static List<RestaurantTo> createListTo(List<Restaurant> restaurants) {

@@ -25,7 +25,6 @@ import static com.github.nut3.votingapp.util.validation.ValidationUtil.checkNew;
 @RestController
 @RequestMapping(value = ProfileController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 @Slf4j
-// TODO: cache only most requested data!
 @CacheConfig(cacheNames = "users")
 public class ProfileController extends AbstractUserController {
 
@@ -38,6 +37,7 @@ public class ProfileController extends AbstractUserController {
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @CacheEvict(key = "#authUser.username")
     public void delete(@AuthenticationPrincipal AuthUser authUser) {
         super.delete(authUser.id());
     }
@@ -57,7 +57,7 @@ public class ProfileController extends AbstractUserController {
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Transactional
-    @CacheEvict(allEntries = true)
+    @CacheEvict(key = "#authUser.username")
     public void update(@RequestBody @Valid UserTo userTo, @AuthenticationPrincipal AuthUser authUser) {
         assureIdConsistent(userTo, authUser.id());
         User user = repository.getById(userTo.id());

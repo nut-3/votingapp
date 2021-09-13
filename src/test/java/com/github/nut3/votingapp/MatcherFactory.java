@@ -77,7 +77,7 @@ public class MatcherFactory {
             return JsonUtil.readValue(getContent(action.andReturn()), clazz);
         }
 
-        public List<T> readArrayFromJson(ResultActions action) throws UnsupportedEncodingException {
+        public List<T> readListFromJson(ResultActions action) throws UnsupportedEncodingException {
             return JsonUtil.readValues(getContent(action.andReturn()), clazz);
         }
 
