@@ -16,11 +16,74 @@ servers:
 security:
   - basicAuth: []
 paths:
+  /api/votes:
+    get:
+      tags:
+        - vote-controller
+      operationId: get
+      parameters:
+        - name: restaurantId
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: from
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VoteTo'
+    put:
+      tags:
+        - vote-controller
+      operationId: change
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VoteTo'
+        required: true
+      responses:
+        '204':
+          description: No Content
+    post:
+      tags:
+        - vote-controller
+      operationId: createWithLocation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VoteTo'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoteTo'
   /api/profile:
     get:
       tags:
         - profile-controller
-      operationId: get_2
+      operationId: get_3
       responses:
         '200':
           description: OK
@@ -69,7 +132,7 @@ paths:
     get:
       tags:
         - admin-user-controller
-      operationId: get_3
+      operationId: get_4
       parameters:
         - name: id
           in: path
@@ -172,21 +235,6 @@ paths:
       responses:
         '204':
           description: No Content
-  /api/restaurants/{id}/vote:
-    post:
-      tags:
-        - restaurant-controller
-      operationId: vote
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
-      responses:
-        '204':
-          description: No Content
   /api/admin/users:
     get:
       tags:
@@ -204,7 +252,7 @@ paths:
     post:
       tags:
         - admin-user-controller
-      operationId: createWithLocation
+      operationId: createWithLocation_1
       requestBody:
         content:
           application/json:
@@ -222,7 +270,7 @@ paths:
     post:
       tags:
         - admin-restaurant-controller
-      operationId: createWithLocation_1
+      operationId: createWithLocation_2
       requestBody:
         content:
           application/json:
@@ -261,45 +309,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LunchMenu'
-  /api/votes:
-    get:
-      tags:
-        - vote-controller
-      operationId: getVotes
-      parameters:
-        - name: restaurantId
-          in: query
-          required: false
-          schema:
-            type: integer
-            format: int32
-        - name: userId
-          in: query
-          required: false
-          schema:
-            type: integer
-            format: int32
-        - name: from
-          in: query
-          required: false
-          schema:
-            type: string
-            format: date
-        - name: to
-          in: query
-          required: false
-          schema:
-            type: string
-            format: date
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/VoteTo'
   /api/restaurants:
     get:
       tags:
@@ -313,7 +322,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/RestaurantTo'
+                  $ref: '#/components/schemas/Restaurant'
   /api/restaurants/{restaurantId}/menus:
     get:
       tags:
@@ -339,7 +348,7 @@ paths:
     get:
       tags:
         - restaurant-menu-controller
-      operationId: get
+      operationId: get_1
       parameters:
         - name: id
           in: path
@@ -364,7 +373,26 @@ paths:
     get:
       tags:
         - restaurant-controller
-      operationId: get_1
+      operationId: get_2
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Restaurant'
+  /api/restaurants/{id}/with-menu:
+    get:
+      tags:
+        - restaurant-controller
+      operationId: getWithMenu
       parameters:
         - name: id
           in: path
@@ -379,6 +407,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RestaurantTo'
+  /api/restaurants/with-menu:
+    get:
+      tags:
+        - restaurant-controller
+      operationId: getAllWithMenu
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RestaurantTo'
   /api/admin/users/by:
     get:
       tags:
@@ -399,6 +441,45 @@ paths:
                 $ref: '#/components/schemas/User'
 components:
   schemas:
+    Dish:
+      required:
+        - name
+      type: object
+      properties:
+        name:
+          maxLength: 100
+          minLength: 2
+          type: string
+        price:
+          type: integer
+          format: int32
+    RestaurantTo:
+      required:
+        - name
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        name:
+          maxLength: 100
+          minLength: 2
+          type: string
+        menu:
+          type: array
+          items:
+            $ref: '#/components/schemas/Dish'
+    VoteTo:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        date:
+          type: string
+          format: date
+        restaurant:
+          $ref: '#/components/schemas/RestaurantTo'
     UserTo:
       required:
         - email
@@ -459,18 +540,18 @@ components:
             enum:
               - USER
               - ADMIN
-    Dish:
+    Restaurant:
       required:
         - name
       type: object
       properties:
+        id:
+          type: integer
+          format: int32
         name:
           maxLength: 100
           minLength: 2
           type: string
-        price:
-          type: number
-          format: double
     LunchMenu:
       required:
         - date
@@ -488,55 +569,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Dish'
-    Restaurant:
-      required:
-        - name
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        name:
-          maxLength: 100
-          minLength: 2
-          type: string
-        menus:
-          type: array
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/LunchMenu'
-    RestaurantTo:
-      required:
-        - name
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        name:
-          maxLength: 100
-          minLength: 2
-          type: string
-        rating:
-          type: integer
-          format: int32
-        menu:
-          type: array
-          items:
-            $ref: '#/components/schemas/Dish'
-    VoteTo:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        date:
-          type: string
-          format: date
-        user:
-          $ref: '#/components/schemas/User'
         restaurant:
-          $ref: '#/components/schemas/RestaurantTo'
+          $ref: '#/components/schemas/Restaurant'
   securitySchemes:
     basicAuth:
       type: http
