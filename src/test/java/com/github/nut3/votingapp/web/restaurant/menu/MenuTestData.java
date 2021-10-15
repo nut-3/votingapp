@@ -9,7 +9,7 @@ import java.time.LocalDate;
 
 @UtilityClass
 public class MenuTestData {
-    public static final MatcherFactory.Matcher<LunchMenu> MATCHER = MatcherFactory.usingIgnoringFieldsComparator(LunchMenu.class, "id", "restaurant", "dishes.id", "dishes.menu");
+    public static final MatcherFactory.Matcher<LunchMenu> MATCHER = MatcherFactory.usingIgnoringFieldsComparator(LunchMenu.class, "id", "date", "restaurant", "dishes.id", "dishes.menu", "$$_hibernate_interceptor");
 
     public static final LunchMenu pushkinLunchMenu1 = new LunchMenu(1, LocalDate.of(2021, 8, 22));
     public static final LunchMenu pushkinLunchMenu2 = new LunchMenu(2, LocalDate.of(2021, 8, 30));
@@ -63,11 +63,19 @@ public class MenuTestData {
         kebabLunchMenu3.addDishes(kebabDish7, kebabDish8, kebabDish9);
     }
 
-    public static LunchMenu getNewMenu() {
+    public static LunchMenu getNew() {
         LunchMenu newLunchMenu = new LunchMenu(null, LocalDate.of(2021, 8, 27));
         newLunchMenu.addDishes(new Dish("New dish1", 150),
                 new Dish("New dish2", 750),
                 new Dish("New dish3", 300));
+        return newLunchMenu;
+    }
+
+    public static LunchMenu getUpdated() {
+        LunchMenu newLunchMenu = new LunchMenu(pushkinLunchMenu2);
+        newLunchMenu.setDishes(new Dish("Updated dish1", 2500),
+                new Dish("Updated dish2", 7500),
+                new Dish("Updated dish3", 3000));
         return newLunchMenu;
     }
 }

@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static com.github.nut3.votingapp.util.JsonUtil.writeValue;
 import static com.github.nut3.votingapp.web.user.ProfileController.REST_URL;
+import static com.github.nut3.votingapp.web.user.UserTestData.MATCHER;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -31,7 +32,7 @@ class ProfileControllerTest extends AbstractControllerTest {
         perform(MockMvcRequestBuilders.get(REST_URL))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(UserTestData.MATCHER.contentJson(UserTestData.user));
+                .andExpect(MATCHER.contentJson(UserTestData.user));
     }
 
     @Test
@@ -45,7 +46,7 @@ class ProfileControllerTest extends AbstractControllerTest {
     void delete() throws Exception {
         perform(MockMvcRequestBuilders.delete(REST_URL))
                 .andExpect(status().isNoContent());
-        UserTestData.MATCHER.assertMatch(userRepository.findAll(), UserTestData.admin);
+        MATCHER.assertMatch(userRepository.findAll(), UserTestData.admin);
     }
 
     @Test
@@ -58,11 +59,11 @@ class ProfileControllerTest extends AbstractControllerTest {
                 .andDo(print())
                 .andExpect(status().isCreated());
 
-        User created = UserTestData.MATCHER.readFromJson(action);
+        User created = MATCHER.readFromJson(action);
         int newId = created.id();
         newUser.setId(newId);
-        UserTestData.MATCHER.assertMatch(created, newUser);
-        UserTestData.MATCHER.assertMatch(userRepository.getById(newId), newUser);
+        MATCHER.assertMatch(created, newUser);
+        MATCHER.assertMatch(userRepository.getById(newId), newUser);
     }
 
     @Test
@@ -74,7 +75,7 @@ class ProfileControllerTest extends AbstractControllerTest {
                 .andDo(print())
                 .andExpect(status().isNoContent());
 
-        UserTestData.MATCHER.assertMatch(userRepository.getById(UserTestData.USER_ID), UserUtil.updateFromTo(new User(UserTestData.user), updatedTo));
+        MATCHER.assertMatch(userRepository.getById(UserTestData.USER_ID), UserUtil.updateFromTo(new User(UserTestData.user), updatedTo));
     }
 
     @Test

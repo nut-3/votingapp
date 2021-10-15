@@ -1,6 +1,7 @@
 package com.github.nut3.votingapp.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,7 +11,6 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -26,8 +26,8 @@ import java.util.List;
 public class LunchMenu extends BaseEntity {
 
     @Column(name = "curr_date", nullable = false, columnDefinition = "date default now()")
-    @NotNull
-    private LocalDate date = LocalDate.now();
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private LocalDate date;
 
     @Size(min = 2, max = 5)
     @BatchSize(size = 200)
@@ -50,6 +50,10 @@ public class LunchMenu extends BaseEntity {
         this.date = date;
     }
 
+    public LunchMenu(LunchMenu m) {
+        this(m.id, m.date);
+    }
+
     public void addDishes(Dish... dishes) {
         if (dishes != null) {
             if (this.dishes == null) {
@@ -57,5 +61,12 @@ public class LunchMenu extends BaseEntity {
             }
             this.dishes.addAll(List.of(dishes));
         }
+    }
+
+    public void setDishes(Dish... dishes) {
+        if (this.dishes != null) {
+            this.dishes.clear();
+        }
+        addDishes(dishes);
     }
 }

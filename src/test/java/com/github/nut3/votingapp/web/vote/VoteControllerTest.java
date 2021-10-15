@@ -4,7 +4,7 @@ import com.github.nut3.votingapp.AbstractControllerTest;
 import com.github.nut3.votingapp.model.Vote;
 import com.github.nut3.votingapp.repository.VoteRepository;
 import com.github.nut3.votingapp.to.VoteTo;
-import com.github.nut3.votingapp.web.TestClock10;
+import com.github.nut3.votingapp.web.Clocks;
 import com.github.nut3.votingapp.web.user.UserTestData;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,17 +19,18 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.List;
 
-import static com.github.nut3.votingapp.util.JsonUtil.writeValue;
 import static com.github.nut3.votingapp.util.VoteUtil.createListTos;
 import static com.github.nut3.votingapp.util.VoteUtil.createTo;
-import static com.github.nut3.votingapp.web.restaurant.RestaurantTestData.pushkin;
+import static com.github.nut3.votingapp.web.restaurant.RestaurantTestData.*;
 import static com.github.nut3.votingapp.web.user.UserTestData.ADMIN_ID;
+import static com.github.nut3.votingapp.web.vote.VoteTestData.MATCHER;
 import static com.github.nut3.votingapp.web.vote.VoteTestData.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WithUserDetails(value = UserTestData.USER_MAIL)
-@Import(TestClock10.class)
+@Import(Clocks.TestClock10.class)
 class VoteControllerTest extends AbstractControllerTest {
 
     @Autowired
@@ -76,40 +77,26 @@ class VoteControllerTest extends AbstractControllerTest {
     @Test
     void vote() throws Exception {
         VoteTo newVote = getNewVoteTo(LocalDate.now(clock));
-        ResultActions action = perform(MockMvcRequestBuilders.post(REST_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(writeValue(newVote)))
+        perform(MockMvcRequestBuilders.post(REST_URL + "?restaurantId=" + mcdonalds.id()))
                 .andDo(print())
                 .andExpect(status().isCreated());
 
-        VoteTo created = MATCHER.readFromJson(action);
-        int newId = created.id();
-        newVote.setId(newId);
-        action.andExpect(redirectedUrlPattern("http*//*" + REST_URL + newId));
         Vote voteFromRepo = voteRepository.getByUserIdAndDate(UserTestData.USER_ID, LocalDate.now(clock));
         MATCHER.assertMatch(createTo(voteFromRepo), newVote);
-        MATCHER.assertMatch(created, newVote);
     }
 
     @Test
     void voteChange() throws Exception {
-        VoteTo newVote = getNewVoteTo(LocalDate.now(clock));
-        ResultActions action = perform(MockMvcRequestBuilders.post(REST_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(writeValue(newVote)))
+        perform(MockMvcRequestBuilders.post(REST_URL + "?restaurantId=" + mcdonalds.id()))
                 .andDo(print())
                 .andExpect(status().isCreated());
-        VoteTo created = MATCHER.readFromJson(action);
-        int newId = created.id();
 
-        VoteTo updatedVote = getUpdatedVoteTo(newId, LocalDate.now(clock));
-        perform(MockMvcRequestBuilders.put(REST_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(writeValue(updatedVote)))
+        VoteTo updatedVote = getUpdatedVoteTo(LocalDate.now(clock));
+        perform(MockMvcRequestBuilders.post(REST_URL + "?restaurantId=" + kebab.id()))
                 .andDo(print())
                 .andExpect(status().isNoContent());
 
-        Vote voteFromRepo = voteRepository.getByUserIdAndDate(UserTestData.USER_ID, LocalDate.now(clock));
-        MATCHER.assertMatch(createTo(voteFromRepo), updatedVote);
+        Vote updatedVoteFromRepo = voteRepository.getByUserIdAndDate(UserTestData.USER_ID, LocalDate.now(clock));
+        MATCHER.assertMatch(createTo(updatedVoteFromRepo), updatedVote);
     }
 }

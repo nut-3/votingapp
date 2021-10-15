@@ -45,6 +45,7 @@ logging:
     ru.topjava.votingapp: DEBUG
     org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver: DEBUG
     org.springframework.cache: TRACE
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
 
 server.servlet:
   encoding:

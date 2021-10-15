@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
+import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
@@ -20,10 +22,18 @@ public abstract class AbstractRestaurantMenuController {
     @Autowired
     private RestaurantRepository restaurantRepository;
 
+    @Autowired
+    protected Clock clock;
+
     @Transactional
     public LunchMenu save(LunchMenu menu, int restaurantId) {
-        log.info("add menu to restaurant {}", restaurantId);
         Restaurant restaurant = restaurantRepository.getById(restaurantId);
+        if (!menu.isNew()) {
+            LunchMenu storedMenu = lunchMenuRepository.getById(menu.id());
+            menu.setDate(storedMenu.getDate());
+        } else {
+            menu.setDate(LocalDate.now(clock));
+        }
         menu.setRestaurant(restaurant);
         return lunchMenuRepository.save(menu);
     }
@@ -36,5 +46,10 @@ public abstract class AbstractRestaurantMenuController {
     public ResponseEntity<LunchMenu> get(int id, int restaurantId) {
         log.info("get menu {} for restaurant {}", id, restaurantId);
         return ResponseEntity.of(lunchMenuRepository.getByIdAndRestaurantId(id, restaurantId));
+    }
+
+    public void delete(int restaurantId, int id) {
+        log.info("delete menu {} for restaurant {}", id, restaurantId);
+        lunchMenuRepository.delete(id);
     }
 }

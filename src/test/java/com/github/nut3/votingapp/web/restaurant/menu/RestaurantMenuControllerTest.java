@@ -2,17 +2,21 @@ package com.github.nut3.votingapp.web.restaurant.menu;
 
 import com.github.nut3.votingapp.AbstractControllerTest;
 import com.github.nut3.votingapp.repository.LunchMenuRepository;
-import com.github.nut3.votingapp.web.restaurant.RestaurantTestData;
 import com.github.nut3.votingapp.web.user.UserTestData;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.List;
 
+import static com.github.nut3.votingapp.util.JsonUtil.writeValue;
+import static com.github.nut3.votingapp.web.restaurant.RestaurantTestData.MCDONALDS_ID;
+import static com.github.nut3.votingapp.web.restaurant.RestaurantTestData.PUSHKIN_ID;
 import static com.github.nut3.votingapp.web.restaurant.menu.MenuTestData.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -27,19 +31,21 @@ class RestaurantMenuControllerTest extends AbstractControllerTest {
 
     @Test
     void getAll() throws Exception {
-        perform(MockMvcRequestBuilders.get(REST_URL + RestaurantTestData.PUSHKIN_ID + "/menus"))
+        ResultActions action = perform(MockMvcRequestBuilders.get(REST_URL + PUSHKIN_ID + "/menus"))
                 .andExpect(status().isOk())
-                .andDo(print())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(MATCHER.contentJson(List.of(pushkinLunchMenu1, pushkinLunchMenu2, pushkinLunchMenu3)));
+                .andDo(print());
+        action.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+        assertEquals(writeValue(List.of(pushkinLunchMenu1, pushkinLunchMenu2, pushkinLunchMenu3)),
+                action.andReturn().getResponse().getContentAsString());
     }
 
     @Test
     void get() throws Exception {
-        perform(MockMvcRequestBuilders.get(REST_URL + RestaurantTestData.MCDONALDS_ID + "/menus/" + mcdonaldsLunchMenu2.id()))
+        ResultActions action = perform(MockMvcRequestBuilders.get(REST_URL + MCDONALDS_ID + "/menus/" + mcdonaldsLunchMenu2.id()))
                 .andExpect(status().isOk())
-                .andDo(print())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(MATCHER.contentJson(mcdonaldsLunchMenu2));
+                .andDo(print());
+        action.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+        assertEquals(writeValue(mcdonaldsLunchMenu2),
+                action.andReturn().getResponse().getContentAsString());
     }
 }

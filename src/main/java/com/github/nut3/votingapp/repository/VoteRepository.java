@@ -7,11 +7,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Transactional(readOnly = true)
 public interface VoteRepository extends BaseRepository<Vote> {
 
     Vote getByUserIdAndDate(int userId, LocalDate date);
+
+    Optional<Vote> findByUserIdAndDate(int userId, LocalDate date);
 
     @EntityGraph(value = "graph.VoteDetails", type = EntityGraph.EntityGraphType.LOAD)
     @Query("""

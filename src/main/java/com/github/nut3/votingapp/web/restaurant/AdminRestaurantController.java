@@ -1,6 +1,8 @@
 package com.github.nut3.votingapp.web.restaurant;
 
 import com.github.nut3.votingapp.model.Restaurant;
+import com.github.nut3.votingapp.repository.RestaurantRepository;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -20,16 +22,19 @@ import static com.github.nut3.votingapp.util.validation.ValidationUtil.checkNew;
 @RequestMapping(value = AdminRestaurantController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 @Slf4j
 @CacheConfig(cacheNames = "restaurants")
-public class AdminRestaurantController extends AbstractRestaurantController {
+@AllArgsConstructor
+public class AdminRestaurantController {
 
     static final String REST_URL = "/api/admin/restaurants";
 
-    @Override
+    private RestaurantRepository restaurantRepository;
+
     @CacheEvict(key = "#id")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable int id) {
-        super.delete(id);
+        log.info("delete restaurant {}", id);
+        restaurantRepository.deleteExisted(id);
     }
 
     @CacheEvict(allEntries = true)
@@ -37,7 +42,7 @@ public class AdminRestaurantController extends AbstractRestaurantController {
     public ResponseEntity<Restaurant> createWithLocation(@Valid @RequestBody Restaurant restaurant) {
         log.info("create {}", restaurant);
         checkNew(restaurant);
-        Restaurant created = save(restaurant);
+        Restaurant created = restaurantRepository.save(restaurant);
         URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path(RestaurantController.REST_URL + "/{id}")
                 .buildAndExpand(created.getId()).toUri();
@@ -50,6 +55,6 @@ public class AdminRestaurantController extends AbstractRestaurantController {
     public void update(@Valid @RequestBody Restaurant restaurant, @PathVariable int id) {
         log.info("update {} with id={}", restaurant, id);
         assureIdConsistent(restaurant, id);
-        super.save(restaurant);
+        restaurantRepository.save(restaurant);
     }
 }

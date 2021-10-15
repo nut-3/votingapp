@@ -13,11 +13,11 @@ public class VoteTo extends BaseTo {
 
     LocalDate date;
 
-    RestaurantTo restaurant;
+    String restaurantName;
 
-    public VoteTo(Integer id, LocalDate date, RestaurantTo restaurant) {
+    public VoteTo(Integer id, LocalDate date, String restaurantName) {
         super(id);
         this.date = date;
-        this.restaurant = restaurant;
+        this.restaurantName = restaurantName;
     }
 }
